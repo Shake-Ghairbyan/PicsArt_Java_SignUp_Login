@@ -1,6 +1,10 @@
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import ExceptionsForRegistration.*;
 
 public class User {
     private String fullName;
@@ -8,7 +12,7 @@ public class User {
     private String email;
     private String passwordHash;
 
-    public User(String s) {
+    public User(String s) throws FullNameException, UsernameException, EmailException {
         String[] split = s.split(",");
         setFullName(split[0]);
         setUsername(split[1]);
@@ -24,28 +28,44 @@ public class User {
         return fullName;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullName(String fullName) throws FullNameException {
+        if (fullName.matches("[A-Z][a-z]*[ ][A-Z][a-z]*")) {
+            this.fullName = fullName;
+        } else {
+            throw new FullNameException(fullName);
+        }
     }
 
     public String getUsername() {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setUsername(String username) throws UsernameException {
+        if (username.length() > 10) {
+            this.username = username;
+        } else {
+            throw new UsernameException("Invalid input data: ", username);
+        }
     }
 
     public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmail(String email) throws EmailException {
+        if (validate(email)) {
+            this.email = email;
+        } else {
+            throw new EmailException(email);
+        }
     }
 
-    public void setPassword(String password) {
-        this.passwordHash = getMd5(password);
+    public void setPassword(String password) throws PasswordException {
+        if (password.length() > 8 && checkPasswordUpperCase(password) && checkPasswordNums(password)) {
+            this.passwordHash = getMd5(password);
+        } else {
+            throw new PasswordException(password);
+        }
     }
 
     public String toString() {
@@ -69,5 +89,33 @@ public class User {
 
     public boolean checkPassword(String enteredPassword) {
         return getMd5(enteredPassword).equals(passwordHash);
+    }
+
+    private static final Pattern VALID_EMAIL_ADDRESS_REGEX =
+            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
+    private static boolean validate(String emailStr) {
+        Matcher matcher = VALID_EMAIL_ADDRESS_REGEX.matcher(emailStr);
+        return matcher.find();
+    }
+
+    private static boolean checkPasswordNums(String password) {
+        Pattern patternNums = Pattern.compile("[0-9].*[0-9].*[0-9]");
+        Matcher matcherNums = patternNums.matcher(password);
+        if (matcherNums.find()) {
+            return true;
+        }
+        System.out.println("Inserted password doesn't contain numbers");
+        return false;
+    }
+
+    private static boolean checkPasswordUpperCase(String password) {
+        Pattern patternUpperCase = Pattern.compile("[A-Z].*[A-Z]");
+        Matcher matcherUpperCase = patternUpperCase.matcher(password);
+        if (matcherUpperCase.find()) {
+            return true;
+        }
+        System.out.println("Inserted password doesn't contain UpperCase letters /at least 2/.");
+        return false;
     }
 }
