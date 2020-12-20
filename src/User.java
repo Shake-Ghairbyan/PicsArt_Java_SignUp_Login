@@ -67,7 +67,7 @@ public class User {
         }
     }
 
-    public boolean checkPassword(String enteredPassword){
+    public boolean checkPassword(String enteredPassword) {
         return getMd5(enteredPassword).equals(passwordHash);
     }
 }
