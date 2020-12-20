@@ -1,7 +1,5 @@
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class UserService {
     private static final String PATH = "database.txt";
@@ -11,13 +9,11 @@ public class UserService {
         User user = new User();
         try {
             System.out.println("Insert Name and Surname");
-            user.setName(scan.next());
-            user.setSurname(scan.next());
-            scan.nextLine();
+            user.setFullName(scan.nextLine());
             System.out.println("Insert username /at least 10 symbols/.");
             user.setUsername(scan.nextLine());
             System.out.println("Insert email address.");
-            user.setUsername(scan.nextLine());
+            user.setEmail(scan.nextLine());
             System.out.println("Insert password /at least 8 symbols, 2 upper case letters and 3 numbers/.");
             user.setPassword(scan.nextLine());
             FileService.write(PATH, user);
@@ -25,16 +21,15 @@ public class UserService {
             System.out.println(e);
             System.out.println("Inputs are discarded");
         }
-        scan.close();
     }
 
-    public static List<User> readUser() {
-        List<User> users;
+    public static HashMap<String, User> readUsers() {
+        HashMap<String, User> users = new HashMap<>();
         try {
             List<String> strings = FileService.read(PATH);
-            users = new ArrayList<>();
             for (String s : strings) {
-                users.add(new User(s));
+                User user = new User(s);
+                users.put(user.getUsername(), user);
             }
             return users;
         } catch (IndexOutOfBoundsException e) {
@@ -42,22 +37,27 @@ public class UserService {
         } catch (IOException e) {
             System.out.println("Could not read Users.");
         }
-        return new ArrayList<>();
+        return new HashMap<>();
     }
 
-    public static boolean login() throws IOException {
+    public static boolean login() {
         Scanner scan = new Scanner(System.in);
         System.out.println("Insert username.");
         String username = scan.nextLine();
-        if(readUser().contains(username)){
+        HashMap<String, User> users = readUsers();
+        User currentUser = users.get(username);
+        if (currentUser != null) {
             System.out.println("Insert password");
             String password = scan.nextLine();
-//            boolean isCorrect = true;
-//            while (isCorrect){
-//                switch ()
-//            }
+            if (currentUser.checkPassword(password)) {
+                System.out.println("Successfully logged in.");
+                return true;
+            } else {
+                System.out.println("Incorrect password!");
+            }
+        } else {
+            System.out.println("Incorrect login!");
         }
-
-        return true;
+        return false;
     }
 }

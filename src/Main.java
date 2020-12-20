@@ -1,5 +1,6 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Scanner;
 
 public class Main {
@@ -18,10 +19,10 @@ public class Main {
             int command = scan.nextInt();
             switch (command) {
                 case 1:
-                    System.out.println(".......Signing up.......");
+                    UserService.signUp();
                     break;
                 case 2:
-                    System.out.println(".......Logging in.......");
+                    UserService.login();
                     break;
                 case 3:
                     System.out.println("Leaving so soon?");

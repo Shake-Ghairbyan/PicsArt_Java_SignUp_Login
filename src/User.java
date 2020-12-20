@@ -1,37 +1,31 @@
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 public class User {
-    private String name;
-    private String surname;
+    private String fullName;
     private String username;
     private String email;
-    private String password;
+    private String passwordHash;
 
     public User(String s) {
         String[] split = s.split(",");
-        setName(split[0]);
-        setSurname(split[1]);
-        setUsername(split[2]);
-        setEmail(split[3]);
-        setPassword(split[4]);
+        setFullName(split[0]);
+        setUsername(split[1]);
+        setEmail(split[2]);
+        passwordHash = split[3];
     }
 
     public User() {
 
     }
 
-    public String getName() {
-        return name;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getUsername() {
@@ -50,15 +44,30 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(String password) {
-        this.password = password;
+        this.passwordHash = getMd5(password);
     }
 
-    public String  toString(){
-        return name + ", " + surname + ", " + username + ", " + email + ", " + password;
+    public String toString() {
+        return fullName + "," + username + "," + email + "," + passwordHash;
+    }
+
+    private static String getMd5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes());
+            BigInteger no = new BigInteger(1, messageDigest);
+            String hashtext = no.toString(16);
+            while (hashtext.length() < 32) {
+                hashtext = "0" + hashtext;
+            }
+            return hashtext;
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public boolean checkPassword(String enteredPassword){
+        return getMd5(enteredPassword).equals(passwordHash);
     }
 }
