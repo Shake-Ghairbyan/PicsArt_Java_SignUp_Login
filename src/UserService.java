@@ -27,6 +27,7 @@ public class UserService {
             System.out.println("Insert password /at least 8 symbols, 2 upper case letters and 3 numbers/.");
             user.setPassword(scan.nextLine());
             FileService.write(PATH, user);
+            System.out.println("Congrats! Successfully signed in.");
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("Inputs are discarded");

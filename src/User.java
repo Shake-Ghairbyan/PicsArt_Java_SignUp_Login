@@ -60,13 +60,13 @@ public class User {
         }
     }
 
-    public void setPassword(String password) throws PasswordException, Exception {
+    public void setPassword(String password) throws PasswordException {
         if (password.length() <= 8) {
             throw new PasswordException(password);
         }
         validatePasswordUpperCase(password);
         validatePasswordNums(password);
-        passwordHash = password;
+        this.passwordHash = getMd5(password);
     }
 
     public String toString() {
@@ -100,21 +100,21 @@ public class User {
         return matcher.find();
     }
 
-    private static boolean validatePasswordNums(String password) throws Exception {
+    private static boolean validatePasswordNums(String password) throws PasswordException {
         Pattern patternNums = Pattern.compile("[0-9].*[0-9].*[0-9]");
         Matcher matcherNums = patternNums.matcher(password);
         if (matcherNums.find()) {
             return true;
         }
-        throw new Exception("Inserted password doesn't contain numbers or not sufficient quantity.");
+        throw new PasswordException("Inserted password doesn't contain numbers or not sufficient quantity.");
     }
 
-    private static boolean validatePasswordUpperCase(String password) throws Exception {
+    private static boolean validatePasswordUpperCase(String password) throws PasswordException {
         Pattern patternUpperCase = Pattern.compile("[A-Z].*[A-Z]");
         Matcher matcherUpperCase = patternUpperCase.matcher(password);
         if (matcherUpperCase.find()) {
             return true;
         }
-        throw new Exception("Inserted password doesn't contain UpperCase letters /at least 2/.");
+        throw new PasswordException("Inserted password doesn't contain UpperCase letters /at least 2/.");
     }
 }
